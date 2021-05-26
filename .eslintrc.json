@@ -1,0 +1,16 @@
+{
+    "extends": [
+        "eslint:recommended"
+    ],
+    "rules": {
+        "no-extra-parens": "error",
+        "no-unused-vars": "warn",
+        "no-trailing-spaces": "error",
+        "spaced-comment": "warn",
+        "no-multiple-empty-lines": "error",
+        "indent": ["error", 2],
+        "no-undef": "off"
+    },
+    "parser": "babel-eslint"
+
+}
