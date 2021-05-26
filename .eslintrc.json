@@ -8,7 +8,7 @@
         "no-trailing-spaces": "error",
         "spaced-comment": "warn",
         "no-multiple-empty-lines": "error",
-        "indent": ["error", 2],
+        "indent": ["error", "tab"],
         "no-undef": "off"
     },
     "parser": "babel-eslint"
