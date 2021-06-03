@@ -9,9 +9,13 @@ Toujours le même paragraphe
 
 Et un nouveau paragraphe !
 
-### Un titre de niv 3
-
 ```sh
 # Un bloc de code en shell
 echo "coucou les lapinous"
 ```
+
+### Un titre de niv 3
+
+* une liste
+* à
+* puce
