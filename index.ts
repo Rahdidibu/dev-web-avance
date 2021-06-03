@@ -3,10 +3,6 @@ import { readFileSync } from 'fs';
 const file = readFileSync('text.md', 'utf8');
 const md = file.split('\n\n'); // remove tabulations for LF file.
 
-/* enum States {
-	NULL, "identify", "read", "following", "ending"
-}; */
-
 class Block {
 	id: string;
 	html: string;
@@ -39,6 +35,15 @@ class TITLE_3 extends Block {
 	}
 }
 
+class LIST_OBJECT extends Block {
+	constructor() {
+		super();
+		this.id = "*";
+		this.html = "ul";
+		this.canContain = false;
+	}
+}
+
 class PARAGRAPH extends Block {
 	constructor() {
 		super();
@@ -59,7 +64,7 @@ class CODE extends Block {
 	}
 }
 
-const blocks: Array<Block> = [new TITLE_1, new TITLE_2, new TITLE_3, new CODE];
+const blocks: Array<Block> = [new TITLE_1, new TITLE_2, new TITLE_3, new CODE, new LIST_OBJECT];
 
 var json;
 var objects = [];
@@ -122,7 +127,16 @@ function saveToJson(child: Object, objects: Array<Object>, index: number) {
 	if (parent[Object.keys(parent)[0]].content) {
 		parent[Object.keys(parent)[0]].content = { ...parent[Object.keys(parent)[0]].content, ...child };
 	} else {
-		parent = Object.assign(child, objects[index]);
+		if (objects[index]['ul']) {
+			let ul = objects[index]['ul'].split('\n');
+			let list = { ul: [] };
+			for (let li = 0; li < ul.length; li++) {
+				if (ul[li].substring(0, 1) === "*") list['ul'].push({ li: ul[li].substring(2) });
+				else list['ul'].push({ li: ul[li] });
+			}
+
+			parent = Object.assign(child, list);
+		} else parent = Object.assign(child, objects[index]);
 	}
 
 	return saveToJson(parent, objects, index - 1);
