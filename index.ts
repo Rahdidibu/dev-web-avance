@@ -52,7 +52,7 @@ class PARAGRAPH extends Block {
 class CODE extends Block {
 	constructor() {
 		super();
-		this.id = "```sh";
+		this.id = "```$";
 		this.html = "code";
 		this.canContain = false;
 		this.endBlock = "```";
@@ -71,13 +71,23 @@ function identify(line: string, index: number = 0, identifier: string = ""): Blo
 	}
 
 	let substr = line.substring(index, index + 1);
-	if(substr === "\\") substr = line.substring(index, index + 2);
+	if (substr === "\\") substr = line.substring(index, index + 2);
 
 	// Stop identification when space char detected
 	if (substr === " " || substr === "\n") {
 		for (let block of blocks) {
-			if (identifier !== block.id) continue;
-			else return block;
+			if (identifier !== block.id) {
+				let indexOfVariable = block.id.indexOf('$');
+
+				if (indexOfVariable >= 0) {
+					let blockId = block.id.replace('$', identifier.substr(indexOfVariable, identifier.length));
+					if (identifier === blockId) return block;
+				}
+
+				continue;
+			}
+
+			return block;
 		}
 	}
 
@@ -88,17 +98,16 @@ function identify(line: string, index: number = 0, identifier: string = ""): Blo
 
 function read(line: string, block: Block): string {
 	if (block.id.length) {
-		if(block.endBlock) {
+		if (block.endBlock) {
 			line = line.substring(0, line.length - block.endBlock.length);
 		}
-		return line.substring(block.id.length + 1);
+		return line.substring(block.id.length + 1); // +1 for space
 	}
 
 	return line;
 }
 
 function convertToObjects(text: string, block: Block) {
-	
 	if (block.canContain) {
 		objects.push({ [block.html]: { label: text, content: {} } });
 	} else {
@@ -134,7 +143,6 @@ for (let line of md) {
 	}
 }
 
-console.log(objects);
 json = saveToJson({}, objects, objects.length - 1);
 
 console.log(JSON.stringify(json));
