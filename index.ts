@@ -7,14 +7,21 @@ import { Code } from './Code';
 import { UnorderedList } from './UnorderedList';
 import { Paragraph } from './Paragraph';
 
+// Read markdown file to parse
 const file = readFileSync('text.md', 'utf8');
-const md = file.split('\n\n'); // remove tabulations for LF file.
+// Remove tabulations for LF file
+const md = file.split('\n\n');
 
+// Define blocks used to identify each markdown lines
 const blocks: Array<Block> = [new Title1, new Title2, new Title3, new Code, new UnorderedList];
 
-var json;
-var objects = [];
-
+/**
+ * Identify line from a markdown
+ * @param line string
+ * @param index number
+ * @param identifier string
+ * @returns Block
+ */
 function identify(line: string, index: number = 0, identifier: string = ""): Block | null {
 	if (index > line.length) {
 		// Block is a paragraph or a bad-formatted line
@@ -47,26 +54,47 @@ function identify(line: string, index: number = 0, identifier: string = ""): Blo
 	return identify(line, index + 1, identifier);
 }
 
+/**
+ * Read line content
+ * @param line string
+ * @param block Block
+ * @returns string
+ */
 function read(line: string, block: Block): string {
 	if (block.id.length) {
 		if (block.endBlock) {
 			line = line.substring(0, line.length - block.endBlock.length);
 		}
-		return line.substring(block.id.length + 1); // +1 for space
+		return line.substring(block.id.length + 1); // +1 to count space
 	}
 
 	return line;
 }
 
-function convertToObjects(text: string, block: Block) {
+/**
+ * Convert a markdown "block" to an object, store it in an array and return the array
+ * @param text string
+ * @param block Block
+ * @param objects Array<Object>
+ * @returns Array<Object>
+ */
+function convertToObjects(text: string, block: Block, objects: Array<Object>): Array<Object> {
 	if (block.canContain) {
 		objects.push({ [block.html]: { label: text, content: {} } });
 	} else {
 		objects.push({ [block.html]: text });
 	}
+	return objects;
 }
 
-function saveToJson(child: Object, objects: Array<Object>, index: number) {
+/**
+ * Convert objects to json
+ * @param child Object
+ * @param objects Array<Object>
+ * @param index number
+ * @returns Object
+ */
+function saveToJson(child: Object, objects: Array<Object>, index: number): Object {
 	if (index < 0) return child;
 
 	var parent = objects[index];
@@ -90,21 +118,20 @@ function saveToJson(child: Object, objects: Array<Object>, index: number) {
 
 // -------------------------------------------------------
 
+let objects = [];
 for (let line of md) {
 	if (line.length === 0) continue;
 
+	// First, identify the line
 	let block: Block = identify(line);
+	// Then, read the content
 	let text = read(line, block);
-
-	try {
-		convertToObjects(text, block);
-	} catch (error) {
-		console.warn(error);
-	}
+	// Finally, convert it into an object an store it in an array
+	convertToObjects(text, block, objects);
 }
 
-json = saveToJson({}, objects, objects.length - 1);
+// Store result in variable
+var json = saveToJson({}, objects, objects.length - 1);
 
+// Log final json result in console
 console.log(JSON.stringify(json));
-
-// https://asciiparait.fr/courses/development-advanced/02-state-machines/
