@@ -1,70 +1,16 @@
 import { readFileSync } from 'fs';
+import { Block } from './Block';
+import { Title1 } from './Title1';
+import { Title2 } from './Title2';
+import { Title3 } from './Title3';
+import { Code } from './Code';
+import { UnorderedList } from './UnorderedList';
+import { Paragraph } from './Paragraph';
 
 const file = readFileSync('text.md', 'utf8');
 const md = file.split('\n\n'); // remove tabulations for LF file.
 
-class Block {
-	id: string;
-	html: string;
-	multiLine: boolean = false;
-	canContain: boolean = true;
-	endBlock: string;
-}
-
-class TITLE_1 extends Block {
-	constructor() {
-		super();
-		this.id = "#";
-		this.html = "h1";
-	}
-}
-
-class TITLE_2 extends Block {
-	constructor() {
-		super();
-		this.id = "##";
-		this.html = "h2";
-	}
-}
-
-class TITLE_3 extends Block {
-	constructor() {
-		super();
-		this.id = "###";
-		this.html = "h3";
-	}
-}
-
-class LIST_OBJECT extends Block {
-	constructor() {
-		super();
-		this.id = "*";
-		this.html = "ul";
-		this.canContain = false;
-	}
-}
-
-class PARAGRAPH extends Block {
-	constructor() {
-		super();
-		this.id = "";
-		this.html = "p";
-		this.multiLine = true;
-		this.canContain = false;
-	}
-}
-
-class CODE extends Block {
-	constructor() {
-		super();
-		this.id = "```$";
-		this.html = "code";
-		this.canContain = false;
-		this.endBlock = "```";
-	}
-}
-
-const blocks: Array<Block> = [new TITLE_1, new TITLE_2, new TITLE_3, new CODE, new LIST_OBJECT];
+const blocks: Array<Block> = [new Title1, new Title2, new Title3, new Code, new UnorderedList];
 
 var json;
 var objects = [];
@@ -72,7 +18,7 @@ var objects = [];
 function identify(line: string, index: number = 0, identifier: string = ""): Block | null {
 	if (index > line.length) {
 		// Block is a paragraph or a bad-formatted line
-		return new PARAGRAPH;
+		return new Paragraph;
 	}
 
 	let substr = line.substring(index, index + 1);
