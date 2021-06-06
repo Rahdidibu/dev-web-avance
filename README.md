@@ -4,8 +4,11 @@ Le projet consiste à prendre un fichier Markdown en entrée, et à le convertir
 
 ## Prérequis
 
+N.B. : le script marche chez les développeurs, donc fonctionne forcément à tous les coups
 - NodeJS version 10+
 - NPM version 7+
+- Séquence de fin de ligne du fichier Markdown en LF
+- Si le programme ne marche pas, relire la ligne 1
 
 ## Utilisation
 
@@ -49,4 +52,15 @@ Sortie attendue :
 
 ## Fonctionnement
 
-TODO parce que flemme là il est 1h du mat' donc bon
+### 1 - Récupération du fichier
+
+Le ficher markdown est récupéré et les tabulations retirées pour faciliter le traitement.
+
+### 2 - Identification et parsing
+
+Chaque ligne du fichier Markdown est lue et identifiée comme étant un "bloc" spécifique, tel qu'un titre ou un paragraphe (fonction récursive `identify`). Elle sont ensuite converties en objet et stockés dans un tableau.
+
+### 3 - Création du JSON
+
+Le tableau d'objet créé précédemment est déroulé dans l'ordre inverse (fonction récursive `saveToJson`) : pour chaque objet (le "child"), l'algorithme essaie de lui trouver un "parent" dans lequel le stocker. Au fur et à mesure, l'objet grandit et devient le JSON final. Oui, l'enfant grandit et devient grand, le développement c'est aussi de la poésie parfois...
+Le JSON est ensuite affiché dans la console.
